@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>rep24 · Grant Role</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #040208;
+  color: #f5f4f0;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 24px;
+}
+
+.card {
+  background: #070510;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 32px 28px;
+  width: 100%; max-width: 420px;
+}
+
+.logo {
+  font-size: 1.6rem; font-weight: 800;
+  letter-spacing: -0.04em; margin-bottom: 6px;
+}
+.logo span { color: #4BA3E3; }
+
+.subtitle {
+  font-size: 0.72rem;
+  font-family: monospace;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+.info-row {
+  display: flex; flex-direction: column; gap: 4px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+}
+.info-label {
+  font-size: 0.58rem; font-family: monospace;
+  color: rgba(255,255,255,0.28);
+  letter-spacing: 0.14em; text-transform: uppercase;
+}
+.info-val {
+  font-size: 0.72rem; font-family: monospace;
+  color: rgba(255,255,255,0.6);
+  word-break: break-all;
+}
+.info-val.green { color: #2BFFAA; }
+.info-val.blue  { color: #4BA3E3; }
+
+.divider {
+  height: 1px; background: rgba(255,255,255,0.06);
+  margin: 22px 0;
+}
+
+.btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 100px;
+  border: none;
+  font-size: 0.9rem; font-weight: 600;
+  cursor: pointer;
+  transition: all .22s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.btn-connect {
+  background: hsl(262,83%,62%);
+  color: #fff;
+  box-shadow: 0 0 28px rgba(139,92,246,0.4);
+}
+.btn-connect:hover { background: hsl(262,83%,55%); }
+
+.btn-grant {
+  background: rgba(43,255,170,0.12);
+  color: #2BFFAA;
+  border: 1px solid rgba(43,255,170,0.25);
+}
+.btn-grant:hover { background: rgba(43,255,170,0.2); }
+.btn-grant:disabled {
+  opacity: 0.4; cursor: not-allowed;
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.3);
+  border-color: rgba(255,255,255,0.06);
+}
+
+.status {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 0.75rem; font-family: monospace;
+  line-height: 1.7;
+  display: none;
+}
+.status.info    { background: rgba(75,163,227,0.08); border: 1px solid rgba(75,163,227,0.2); color: #4BA3E3; }
+.status.success { background: rgba(43,255,170,0.07); border: 1px solid rgba(43,255,170,0.2); color: #2BFFAA; }
+.status.error   { background: rgba(255,107,107,0.07); border: 1px solid rgba(255,107,107,0.2); color: #FF6B6B; }
+
+.wallet-addr {
+  margin-top: 16px;
+  font-size: 0.62rem; font-family: monospace;
+  color: rgba(255,255,255,0.22);
+  text-align: center;
+  display: none;
+}
+
+.notice {
+  margin-top: 20px;
+  padding: 12px 16px;
+  background: rgba(255,207,119,0.05);
+  border: 1px solid rgba(255,207,119,0.14);
+  border-radius: 10px;
+  font-size: 0.68rem;
+  color: rgba(255,207,119,0.7);
+  line-height: 1.6;
+}
+.notice strong { color: #FFCF77; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">rep<span>24</span></div>
+  <div class="subtitle">// grant role · RepVault</div>
+
+  <div class="info-row">
+    <div class="info-label">Contract</div>
+    <div class="info-val blue">RepVault · 0x47b8055E...947E5</div>
+  </div>
+
+  <div class="info-row">
+    <div class="info-label">Granting ADMIN_ROLE to</div>
+    <div class="info-val green">JobManager · 0x9FDDFb56...72359</div>
+  </div>
+
+  <div class="info-row">
+    <div class="info-label">Role</div>
+    <div class="info-val">ADMIN_ROLE · keccak256</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <button class="btn btn-connect" id="btn-connect" onclick="connectWallet()">
+    Connect MetaMask
+  </button>
+
+  <button class="btn btn-grant" id="btn-grant" onclick="grantRole()" disabled style="margin-top:10px">
+    Grant Role
+  </button>
+
+  <div class="wallet-addr" id="wallet-addr"></div>
+
+  <div class="status" id="status"></div>
+
+  <div class="notice">
+    <strong>Open this page inside MetaMask's browser.</strong><br/>
+    Tap the menu in MetaMask → Browser → paste this URL. Then connect and tap Grant Role.
+  </div>
+</div>
+
+<script>
+const REPVAULT    = "0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5";
+const JOBMANAGER  = "0x9FDDFb5648A3E862bA7C5Fb406b876d950a72359";
+const BASE_SEPOLIA_CHAIN_ID = "0x14a34"; // 84532
+
+// ADMIN_ROLE = keccak256("ADMIN_ROLE")
+const ADMIN_ROLE  = "0xa49807205ce4d355092ef5a8a18f56e8913cf4a201fbe287825b095693c21775";
+
+// Minimal ABI — just grantRole
+const ABI = [
+  "function grantRole(bytes32 role, address account) external",
+  "function hasRole(bytes32 role, address account) external view returns (bool)"
+];
+
+let provider, signer;
+
+function showStatus(msg, type) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status ' + type;
+  el.style.display = 'block';
+}
+
+async function connectWallet() {
+  if (!window.ethereum) {
+    showStatus('MetaMask not detected. Open this page inside MetaMask browser.', 'error');
+    return;
+  }
+  try {
+    showStatus('Connecting...', 'info');
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+    // Switch to Base Sepolia
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: BASE_SEPOLIA_CHAIN_ID }],
+      });
+    } catch(e) {
+      if (e.code === 4902) {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: BASE_SEPOLIA_CHAIN_ID,
+            chainName: 'Base Sepolia',
+            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://sepolia.base.org'],
+            blockExplorerUrls: ['https://sepolia.basescan.org']
+          }]
+        });
+      }
+    }
+
+    provider = new ethers.BrowserProvider(window.ethereum);
+    signer = await provider.getSigner();
+    const addr = await signer.getAddress();
+
+    document.getElementById('wallet-addr').textContent = 'Connected: ' + addr;
+    document.getElementById('wallet-addr').style.display = 'block';
+    document.getElementById('btn-connect').textContent = '✓ Connected';
+    document.getElementById('btn-connect').style.background = 'rgba(43,255,170,0.1)';
+    document.getElementById('btn-connect').style.color = '#2BFFAA';
+    document.getElementById('btn-connect').style.border = '1px solid rgba(43,255,170,0.2)';
+    document.getElementById('btn-connect').style.boxShadow = 'none';
+    document.getElementById('btn-grant').disabled = false;
+
+    // Check if role already granted
+    const contract = new ethers.Contract(REPVAULT, ABI, provider);
+    try {
+      const hasRole = await contract.hasRole(ADMIN_ROLE, JOBMANAGER);
+      if (hasRole) {
+        showStatus('✓ ADMIN_ROLE already granted to JobManager. Nothing to do!', 'success');
+        document.getElementById('btn-grant').disabled = true;
+        return;
+      }
+    } catch(e) {
+      // hasRole check failed — contract may need DEFAULT_ADMIN_ROLE, continue anyway
+    }
+
+    showStatus('Wallet connected. Tap Grant Role to proceed.', 'info');
+  } catch(e) {
+    showStatus('Connection failed: ' + e.message, 'error');
+  }
+}
+
+async function grantRole() {
+  if (!signer) { showStatus('Connect wallet first.', 'error'); return; }
+
+  try {
+    document.getElementById('btn-grant').disabled = true;
+    showStatus('Sending transaction — confirm in MetaMask...', 'info');
+
+    const contract = new ethers.Contract(REPVAULT, ABI, signer);
+    const tx = await contract.grantRole(ADMIN_ROLE, JOBMANAGER);
+
+    showStatus('Transaction sent. Waiting for confirmation...\n\nTx: ' + tx.hash, 'info');
+
+    const receipt = await tx.wait();
+
+    if (receipt.status === 1) {
+      showStatus(
+        '✓ ADMIN_ROLE granted successfully!\n\n' +
+        'Tx: ' + receipt.hash + '\n' +
+        'Block: ' + receipt.blockNumber,
+        'success'
+      );
+    } else {
+      showStatus('Transaction failed. Check Basescan.', 'error');
+      document.getElementById('btn-grant').disabled = false;
+    }
+  } catch(e) {
+    const msg = e.reason || e.message || 'Unknown error';
+    showStatus('Error: ' + msg, 'error');
+    document.getElementById('btn-grant').disabled = false;
+  }
+}
+</script>
+</body>
+</html>
