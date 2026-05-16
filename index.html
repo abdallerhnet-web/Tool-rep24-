@@ -69,6 +69,12 @@ a { color: #4B8BFF; }
 
 <script>
 const BASE_SEPOLIA = 84532;
+// Multiple RPC fallbacks to avoid rate limiting
+const RPCS = [
+  'https://base-sepolia.blockpi.network/v1/rpc/public',
+  'https://base-sepolia-rpc.publicnode.com',
+  'https://sepolia.base.org',
+];
 const JOB_MANAGER  = '0x6B51090ED106616ddB52c20EE8Fb1F2306D7aF51';
 const REP_SCORE    = '0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3';
 const REP_VAULT    = '0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5';
